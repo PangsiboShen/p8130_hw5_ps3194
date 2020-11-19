@@ -7,6 +7,7 @@ output: html_document
 
 ```{r message=FALSE}
 library(tidyverse)
+library(arsenal)
 ```
 
 ## Problem 1
@@ -17,20 +18,28 @@ unanswered and missing values). You can use R to perform the calculations, but m
 state test that you used, the hypotheses, test statistic, p-value and provide interpretation in the
 context of the problem.
 
+#### solution
+
 ```{r message=FALSE}
 #load antibodies dataset
 antibodies = read_csv("./data/Antibodies.csv") %>%
-  drop_na()
+  drop_na() #remove NA values
 
 #extract IgM values for Normal group
-Normal = antibodies %>%
+Normal = 
+  antibodies %>%
   filter(Smell == "Normal") %>%
   pull(Antibody_IgM)
+
 #extract IgM values for Altered group
-Altered = antibodies %>%
+Altered=
+  antibodies %>%
   filter(Smell == "Altered") %>%
   pull(Antibody_IgM)
 ```
+
+We first loaded the antibodies dataset and extract Ig-M levels for both Normal and Altered groups.Then we're going to do test for normality on both groups.
+
 ```{r message=FALSE}
 #Graphic methods to test for normality
 par(mfrow=c(2,2))
@@ -43,9 +52,46 @@ qqnorm(Altered, col=2, pch=19, cex=1.5)
 qqline(Altered, col = 1,lwd=2,lty=2)
 ```
 
+From both the histograms and Quantitle Quantitle plots, we found both groups failed their normality assumptions. Hence, we're going to use non-parametric Wilcoxon-Rank Sum Test to assess whether there is difference in Ig-M levels between the Normal and Altered groups since both groups have more than 10 observations and we're under normal-approximation. First, we establish our hypotheses:
+
+
+$$
+\begin{split}
+H_0: the \ medians \ of \ the \ two \ populations \ are \ equal\\
+H_1: the \ medians \ of \ the \ two \ populations \ are \ not \ equal\\
+\end{split}
+$$
+
+```{r}
+#check if there is ties in the data
+duplicated.data.frame(antibodies$Antibody_IgM)
+```
+
+Since there is no ties in the data, we're going to use test statistics with no ties
+
+$$
+\begin{split}
+T = \frac{|T_1-\frac{n_1(n_1+n_2+1)}{2}|-\frac{1}{2}}{\sqrt{(\frac{n_1n_2}{12})(n_1+n_2+1)}} \\
+Under~Normal-Approximation: n_1 \ and \  n_2 >10
+\end{split}
+$$
 
 ```{r message=FALSE}
 # Non-parametric Wilcoxon-Rank Sum test: two-independent groups
 wilcox.test(Normal, Altered, mu=0)
+qnorm(0.975) #critical value for 0.05 significance level
 ```
+$$
+\begin{split}
+T > Z_{1-\alpha/2}
+\end{split}
+$$
+We got Test statistic: T = 5836, p-value = 0.01406. Since the test statistic is greater than the critical value and p-value is less than 0.05, we reject the Null hypothesis and conclude that at significance level of 0.05, the medians of Ig-M levels between the control and altered groups are different. 
+
+-------------------
+
+## Problem 2
+
+#### solution 
+
 
