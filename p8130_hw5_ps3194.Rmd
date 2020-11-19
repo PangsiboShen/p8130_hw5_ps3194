@@ -1,0 +1,51 @@
+---
+title: "p8130_hw5_ps3194"
+author: "Pangsibo Shen"
+date: "11/19/2020"
+output: html_document
+---
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+## Problem 1
+
+Given the non-normal distributions, now you are asked to use an alternative, non-parametric test
+to assess and comment on the difference in Ig-M levels between the two groups (please ignore
+unanswered and missing values). You can use R to perform the calculations, but make sure you
+state test that you used, the hypotheses, test statistic, p-value and provide interpretation in the
+context of the problem.
+
+```{r message=FALSE}
+#load antibodies dataset
+antibodies = read_csv("./data/Antibodies.csv") %>%
+  drop_na()
+
+#extract IgM values for Normal group
+Normal = antibodies %>%
+  filter(Smell == "Normal") %>%
+  pull(Antibody_IgM)
+#extract IgM values for Altered group
+Altered = antibodies %>%
+  filter(Smell == "Altered") %>%
+  pull(Antibody_IgM)
+```
+```{r message=FALSE}
+#Graphic methods to test for normality
+par(mfrow=c(2,2))
+hist(Normal, xlab="Antibody Ig-M levels", freq=T, main="Normal Group")
+hist(Altered, xlab="Antibody Ig-M levels", freq=T, main="Altered Group")
+qqnorm(Normal, col=2, pch=19, cex=1.5)
+qqline(Normal, col = 1,lwd=2,lty=2)
+
+qqnorm(Altered, col=2, pch=19, cex=1.5)
+qqline(Altered, col = 1,lwd=2,lty=2)
+```
+
+
+```{r message=FALSE}
+# Non-parametric Wilcoxon-Rank Sum test: two-independent groups
+wilcox.test(Normal, Altered, mu=0)
+```
+
