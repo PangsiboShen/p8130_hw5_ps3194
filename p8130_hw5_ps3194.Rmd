@@ -94,4 +94,16 @@ We got Test statistic: T = 5836, p-value = 0.01406. Since the test statistic is 
 
 #### solution 
 
+ ![](data/HW5_p2_part1.jpg)
+  ![](data/HW5_p2_part2.jpg)
+-----------------
+
+## Problem 3
+
+#### solution
+
+```{r message=FALSE}
+#load the gpa data
+gpa = read_csv("./data/GPA.csv")
+```
 
