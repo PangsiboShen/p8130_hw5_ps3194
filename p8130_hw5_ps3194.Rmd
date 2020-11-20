@@ -200,4 +200,4 @@ The 95% prediction estimate of the freshman GPA for Anne who obtained a score of
 
 ### 6)
 
-The prediction interval in part 5) is wider than the confidence interval in part 4). Because we're taking the error term into account in prediction interval, the standard error is augmented by 1. As a result, the prediction interval is wider than the confidence interval. 
+The prediction interval in part 5) is wider than the confidence interval in part 4). PI is used to predict ranges of the individual value instead of the mean value. As a result, we're taking the error term into account in prediction interval, the standard error is augmented by 1. In other words, PI would have greater uncertainty comparing to CI, hence, the prediction interval is wider than the confidence interval. 
