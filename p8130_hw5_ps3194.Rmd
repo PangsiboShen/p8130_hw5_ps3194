@@ -134,7 +134,7 @@ gpa %>%
   geom_smooth(method='lm', se=FALSE, color='red')
 ```
 ```{r}
-lm1 = lm(gpa$ACT~gpa$GPA)
+lm1 = lm(gpa$GPA~gpa$ACT)
 # Summarize regression
 summary(lm1)
 # Get the critical t value for alpha=0.05 and n-2 df
@@ -150,7 +150,7 @@ $$
 H_0:\beta_1=\beta_{10}=0 \\
 H_1:\beta_1\neq \beta_{10} \\
 t = \frac{\hat{\beta}_1-\beta_{10}}{se(\hat{\beta}_1)} \\
-t = \frac{1.8704-0}{0.6153} = 3.03982 \\
+t = \frac{0.03883-0}{0.01277} = 3.039777 \\
 t_{n-2,1-\alpha/2} = 1.980272 \\
 |t|>t_{n-2,1-\alpha/2}
 $$
@@ -161,9 +161,22 @@ We got test statistics `r Test_statistics_t` which is larger than the critical v
 
 $$
 \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1X \\
-GPA = 18.9754 + 1.8704*ACT
+GPA = 2.11405 + 0.03883*ACT
 $$
 ### 3)
+
+```{r}
+#calculate the 95% CI for the slope
+
+coef<-summary(lm1)$coefficients[2,1] 
+err<-summary(lm1)$coefficients[2,2] 
+slope_int<-coef + c(-1,1)*err*qt(0.975, 118)
+slope_int
+```
+The 95% confidence interval for $\beta1$ is (`r slope_int`) which does not include zero. We are 95% confidence that the true slope(the expected increase in GPA for one point increase in ACT score) will between those two values. If the confidence interval includes zero, then we conclude that there is no evidence of a relationship between the predictor X(ACT score) and the response Y(freshman year GPA) in the population or we fail to reject the null hypothesis.
+
+### 4)
+
 
 
 
