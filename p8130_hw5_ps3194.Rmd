@@ -2,7 +2,7 @@
 title: "p8130_hw5_ps3194"
 author: "Pangsibo Shen"
 date: "11/19/2020"
-output: html_document
+output: pdf_document
 ---
 
 ```{r message=FALSE}
@@ -107,9 +107,13 @@ We got T = `r Test_statistics`, p-value = 0.01406 and T is greater than the crit
 
 ## Problem 2
 
-#### solution 
-
  ![](data/HW5_p2_part1.jpg)
+ 
+ 
+ 
+ -----------------------------
+ 
+ 
   ![](data/HW5_p2_part2.jpg)
 
 -----------------
@@ -134,7 +138,9 @@ gpa %>%
   geom_smooth(method='lm', se=FALSE, color='red')
 ```
 ```{r}
-lm1 = lm(gpa$GPA~gpa$ACT)
+GPA = gpa$GPA
+ACT = gpa$ACT
+lm1 = lm(GPA~ACT)
 # Summarize regression
 summary(lm1)
 # Get the critical t value for alpha=0.05 and n-2 df
@@ -163,6 +169,7 @@ $$
 \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1X \\
 GPA = 2.11405 + 0.03883*ACT
 $$
+
 ### 3)
 
 ```{r}
@@ -177,6 +184,20 @@ The 95% confidence interval for $\beta1$ is (`r slope_int`) which does not inclu
 
 ### 4)
 
+```{r warning==FALSE}
+new <- data.frame(ACT = 28)
+predict.lm(lm1, new, interval = "confidence")
+```
+The 95% interval estimate of the mean freshman GPA for students whose ACT test score is 28 is (3.061384,3.341033.). We are 95% confidence that the true freshman year GPA will lay between 3.061384 and 3.341033 for students whose ACT test score is 28. 
 
+### 5)
 
+```{r}
+#Prediction interval
+predict.lm(lm1, new, interval = "prediction")
+```
+The 95% prediction estimate of the freshman GPA for Anne who obtained a score of 28 on the entrance test is (1.959355,4.443063). We are 95% confidence that the true freshman year GPA for Anne who obtained a score of 28 on the entrance test will lay between 1.959355 and 4.443063.
 
+### 6)
+
+The prediction interval in part 5) is wider than the confidence interval in part 4). Because we're taking the error term into account in prediction interval, the standard error is augmented by 1. As a result, the prediction interval is wider than the confidence interval. 
