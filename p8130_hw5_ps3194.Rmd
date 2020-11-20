@@ -6,8 +6,20 @@ output: html_document
 ---
 
 ```{r message=FALSE}
+#initial setup
 library(tidyverse)
 library(arsenal)
+library(faraway)
+library(broom)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ## Problem 1
@@ -69,24 +81,27 @@ duplicated.data.frame(antibodies$Antibody_IgM)
 
 Since there is no ties in the data, we're going to use test statistics with no ties
 
+```{r message=FALSE}
+# Non-parametric Wilcoxon-Rank Sum test: two-independent groups
+res = wilcox.test(Normal, Altered, mu=0)
+# add the n1(n1+1)/2 term
+res$statistic = res$statistic + length(Normal)*(length(Normal)+1)/2
+res
+Test_statistics = (abs(res$statistic-(length(Normal)*(length(Normal)+length(Altered)+1))/2)-0.5)/sqrt(((length(Normal)*length(Altered))/12)*(length(Normal)+length(Altered)+1))
+Test_statistics #T score
+qnorm(0.975) #critical value for 0.05 significance level
+```
+
 $$
 \begin{split}
 T = \frac{|T_1-\frac{n_1(n_1+n_2+1)}{2}|-\frac{1}{2}}{\sqrt{(\frac{n_1n_2}{12})(n_1+n_2+1)}} \\
+T = \frac{|9157-\frac{81(81+178+1)}{2}|-\frac{1}{2}}{\sqrt{(\frac{81*178}{12})(81+178+1)}} = 2.45563\\
+Z_{1-\alpha/2} = 1.959964 \\
+T>Z_{1-\alpha/2} \\
 Under~Normal-Approximation: n_1 \ and \  n_2 >10
 \end{split}
 $$
-
-```{r message=FALSE}
-# Non-parametric Wilcoxon-Rank Sum test: two-independent groups
-wilcox.test(Normal, Altered, mu=0)
-qnorm(0.975) #critical value for 0.05 significance level
-```
-$$
-\begin{split}
-T > Z_{1-\alpha/2}
-\end{split}
-$$
-We got Test statistic: T = 5836, p-value = 0.01406. Since the test statistic is greater than the critical value and p-value is less than 0.05, we reject the Null hypothesis and conclude that at significance level of 0.05, the medians of Ig-M levels between the control and altered groups are different. 
+We got T = `r Test_statistics`, p-value = 0.01406 and T is greater than the critical value($Z_{1-\alpha/2}$ = `r qnorm(0.975)`).Since the test statistic is greater than the critical value and p-value is less than 0.05, we reject the Null hypothesis and conclude that at significance level of 0.05, the medians of Ig-M levels between the control and altered groups are different. 
 
 -------------------
 
@@ -96,6 +111,7 @@ We got Test statistic: T = 5836, p-value = 0.01406. Since the test statistic is 
 
  ![](data/HW5_p2_part1.jpg)
   ![](data/HW5_p2_part2.jpg)
+
 -----------------
 
 ## Problem 3
@@ -106,4 +122,48 @@ We got Test statistic: T = 5836, p-value = 0.01406. Since the test statistic is 
 #load the gpa data
 gpa = read_csv("./data/GPA.csv")
 ```
+
+### 1)
+
+```{r}
+#Scatter plot with regression line overlaid  
+gpa %>%
+  ggplot(aes(ACT,GPA)) +
+  geom_point() +
+  ggtitle("Scatter Plot of ACT Test Score and Freshman Year GPA") +
+  geom_smooth(method='lm', se=FALSE, color='red')
+```
+```{r}
+lm1 = lm(gpa$ACT~gpa$GPA)
+# Summarize regression
+summary(lm1)
+# Get the critical t value for alpha=0.05 and n-2 df
+qt(0.975, 118)
+# calulate test statistics 
+Test_statistics_t = (summary(lm1)$coefficients[2,1])/(summary(lm1)$coefficients[2,2])
+```
+
+Since we're going to test whether there is a linear association exists between student’s ACT
+score and GPA,  our null hypothesis will be $\beta_1 = 0$. The hypotheses, test statistics and critical value are written below:
+
+$$
+H_0:\beta_1=\beta_{10}=0 \\
+H_1:\beta_1\neq \beta_{10} \\
+t = \frac{\hat{\beta}_1-\beta_{10}}{se(\hat{\beta}_1)} \\
+t = \frac{1.8704-0}{0.6153} = 3.03982 \\
+t_{n-2,1-\alpha/2} = 1.980272 \\
+|t|>t_{n-2,1-\alpha/2}
+$$
+
+We got test statistics `r Test_statistics_t` which is larger than the critical value `r qt(0.975, 118)`. Hence we reject the null hypothesis and conclude that at significance level of 0.05, there is a significant linear association between s between student’s ACT score (X) and GPA at the end of the freshman year (Y). 
+
+### 2)
+
+$$
+\hat{Y} = \hat{\beta}_0 + \hat{\beta}_1X \\
+GPA = 18.9754 + 1.8704*ACT
+$$
+### 3)
+
+
 
